@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Providers/">
+    <Project Path="PaleuzeBackend.Providers.Database/PaleuzeBackend.Providers.Database.csproj" />
+  </Folder>
+  <Folder Name="/Éléments de solution/">
+    <File Path=".dockerignore" />
+    <File Path="docker-compose.dev.yml" />
+    <File Path="docker-compose.prod.yml" />
+  </Folder>
+  <Project Path="PaleuzeBackend.Business/PaleuzeBackend.Business.csproj" />
+  <Project Path="PaleuzeBackend.Api/PaleuzeBackend.Api.csproj" />
+</Solution>
