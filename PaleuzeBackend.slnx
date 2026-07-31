@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/Éléments de solution/">
     <File Path=".dockerignore" />
+    <File Path=".gitignore" />
     <File Path="docker-compose.dev.yml" />
     <File Path="docker-compose.prod.yml" />
   </Folder>
