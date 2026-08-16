@@ -1,23 +1,28 @@
+using PaleuzeBackend.Api.Configuration;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddControllers(opt =>
+{
+    opt.Conventions.Insert(0, new RoutePrefixConvention("api"));
+});
 builder.Services.AddOpenApi();
+
+// Injecting custom services before building the app.
+builder.Services.AddBusinessServices();
+builder.Services.AddDatabaseProvider(builder.Configuration);
+builder.Services.AddModelMapping();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
