@@ -10,6 +10,7 @@ namespace PaleuzeBackend.Api.Mapping
         public ApiMappingProfile()
         {
             this.CreateMap<Tournament, TournamentResponse>();
+            this.CreateMap<TournamentRequest, Tournament>();
         }
     }
 }
