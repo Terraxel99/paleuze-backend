@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 using PaleuzeBackend.Api.Authentication;
 using PaleuzeBackend.Api.Models;
+using PaleuzeBackend.Business.Extensions;
 using PaleuzeBackend.Business.Interfaces;
+using PaleuzeBackend.Business.Models.Authentication;
 
 namespace PaleuzeBackend.Api.Controllers
 {

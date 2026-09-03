@@ -25,6 +25,7 @@ namespace PaleuzeBackend.Api.Controllers.Tournaments
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<TournamentResponse>>> Get()
         {
             var tournaments = await this._tournamentService.GetAllAsync();

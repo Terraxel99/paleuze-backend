@@ -12,7 +12,7 @@ using PaleuzeBackend.Providers.Database.Data;
 namespace PaleuzeBackend.Providers.Database.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    [Migration("20260903221217_SeedRoles")]
+    [Migration("20260903222914_SeedRoles")]
     partial class SeedRoles
     {
         /// <inheritdoc />
@@ -57,21 +57,21 @@ namespace PaleuzeBackend.Providers.Database.Migrations
                             Id = new Guid("dcff469b-c71a-4bb1-b7b7-8352d2c23b14"),
                             ConcurrencyStamp = "TournamentViewer",
                             Name = "TournamentViewer",
-                            NormalizedName = "TournamentViewer"
+                            NormalizedName = "TOURNAMENTVIEWER"
                         },
                         new
                         {
                             Id = new Guid("68f33d13-2d34-40ca-a3cd-460c4fc5e7a8"),
                             ConcurrencyStamp = "TournamentManager",
                             Name = "TournamentManager",
-                            NormalizedName = "TournamentManager"
+                            NormalizedName = "TOURNAMENTMANAGER"
                         },
                         new
                         {
                             Id = new Guid("46db37fb-1894-4122-a782-2d75aafc1bd1"),
                             ConcurrencyStamp = "Admin",
                             Name = "Admin",
-                            NormalizedName = "Admin"
+                            NormalizedName = "ADMIN"
                         });
                 });
 

@@ -18,9 +18,9 @@ namespace PaleuzeBackend.Providers.Database.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("46db37fb-1894-4122-a782-2d75aafc1bd1"), "Admin", "Admin", "Admin" },
-                    { new Guid("68f33d13-2d34-40ca-a3cd-460c4fc5e7a8"), "TournamentManager", "TournamentManager", "TournamentManager" },
-                    { new Guid("dcff469b-c71a-4bb1-b7b7-8352d2c23b14"), "TournamentViewer", "TournamentViewer", "TournamentViewer" }
+                    { new Guid("46db37fb-1894-4122-a782-2d75aafc1bd1"), "Admin", "Admin", "ADMIN" },
+                    { new Guid("68f33d13-2d34-40ca-a3cd-460c4fc5e7a8"), "TournamentManager", "TournamentManager", "TOURNAMENTMANAGER" },
+                    { new Guid("dcff469b-c71a-4bb1-b7b7-8352d2c23b14"), "TournamentViewer", "TournamentViewer", "TOURNAMENTVIEWER" }
                 });
         }
 
