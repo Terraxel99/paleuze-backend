@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaleuzeBackend.Providers.Database.Data;
@@ -11,9 +12,11 @@ using PaleuzeBackend.Providers.Database.Data;
 namespace PaleuzeBackend.Providers.Database.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    partial class TournamentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260902195100_AddIdentity")]
+    partial class AddIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,29 +50,6 @@ namespace PaleuzeBackend.Providers.Database.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("dcff469b-c71a-4bb1-b7b7-8352d2c23b14"),
-                            ConcurrencyStamp = "TournamentViewer",
-                            Name = "TournamentViewer",
-                            NormalizedName = "TournamentViewer"
-                        },
-                        new
-                        {
-                            Id = new Guid("68f33d13-2d34-40ca-a3cd-460c4fc5e7a8"),
-                            ConcurrencyStamp = "TournamentManager",
-                            Name = "TournamentManager",
-                            NormalizedName = "TournamentManager"
-                        },
-                        new
-                        {
-                            Id = new Guid("46db37fb-1894-4122-a782-2d75aafc1bd1"),
-                            ConcurrencyStamp = "Admin",
-                            Name = "Admin",
-                            NormalizedName = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

@@ -13,29 +13,29 @@ namespace PaleuzeBackend.Business.Services
             this._tournamentRepository = tournamentRepository;
         }
 
-        public async Task<IEnumerable<Tournament>> GetAll()
+        public async Task<IEnumerable<Tournament>> GetAllAsync()
         {
-            return await this._tournamentRepository.GetAll();
+            return await this._tournamentRepository.GetAllAsync();
         }
 
-        public async Task<Tournament> GetById(Guid id)
+        public async Task<Tournament> GetByIdAsync(Guid id)
         {
-            return await this._tournamentRepository.GetById(id);
+            return await this._tournamentRepository.GetByIdAsync(id);
         }
 
-        public async Task<Guid> Create(Tournament tournament)
+        public async Task<Guid> CreateAsync(Tournament tournament)
         {
-            return await this._tournamentRepository.Create(tournament);
+            return await this._tournamentRepository.CreateAsync(tournament);
         }
 
-        public async Task Update(Guid id, Tournament tournament)
+        public async Task UpdateAsync(Guid id, Tournament tournament)
         {
-            await this._tournamentRepository.Update(id, tournament);
+            await this._tournamentRepository.UpdateAsync(id, tournament);
         }
 
-        public async Task Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            await this._tournamentRepository.Delete(id);
+            await this._tournamentRepository.DeleteAsync(id);
         }
     }
 }

@@ -1,4 +1,5 @@
 using PaleuzeBackend.Api.Mapping;
+
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Services;
 
@@ -13,6 +14,7 @@ namespace PaleuzeBackend.Api.Configuration
 
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ITournamentService, TournamentService>();
 
             return services;
@@ -27,16 +29,17 @@ namespace PaleuzeBackend.Api.Configuration
                 throw new InvalidOperationException($"Empty connection string \"{DB_CONNSTRING}\" is not allowed.");
             }
 
-            services.AddDatabase(connectionString);
+            services.AddDatabaseProvider(connectionString);
             services.AddRepositories();
 
             return services;
         }
 
-        public static IServiceCollection AddModelMapping(this IServiceCollection services)
+        public static IServiceCollection AddModelMapping(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAutoMapper(config =>
             {
+                // TODO : config.LicenseKey = configuration.Get("Automapper.License");
                 config.AddProfile<ApiMappingProfile>();
                 config.AddProfile<DatabaseMappingProfile>();
             });
