@@ -8,6 +8,9 @@ using PaleuzeBackend.Api.Models;
 using PaleuzeBackend.Business.Extensions;
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models.Authentication;
+using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
 
 namespace PaleuzeBackend.Api.Controllers
 {
@@ -15,8 +18,9 @@ namespace PaleuzeBackend.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthenticationService _authenticationService;
         private readonly TokenGenerator _tokenGenerator;
+        private readonly IAuthenticationService _authenticationService;
+
         private readonly IMapper _mapper;
 
         public AuthController(
@@ -29,11 +33,25 @@ namespace PaleuzeBackend.Api.Controllers
             this._mapper = mapper;
         }
 
-        [HttpPost("me")]
-        [Authorize]
-        public async Task<ActionResult<UserResponse>> Me()
+        [HttpGet("pending-approval")]
+        [Authorize(Roles = UserRole.Admin)]
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetPendingApprovalUsers()
         {
-            return this.NotFound();
+            var users = this._mapper.Map<IEnumerable<UserResponse>>(await this._authenticationService.GetPendingApprovalUsersAsync());
+            return this.Ok(users);
+        }
+
+        [HttpPatch]
+        [Authorize(Roles = UserRole.Admin)]
+        public async Task<ActionResult> ApproveUser(Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                return this.BadRequest();
+            }
+
+            await this._authenticationService.ApproveUserAsync(userId);
+            return this.NoContent();
         }
 
         [HttpPost("register")]
@@ -51,7 +69,7 @@ namespace PaleuzeBackend.Api.Controllers
             var authenticatedUser = this._mapper.Map<UserResponse>(
                 await this._authenticationService.LoginAsync(data.UserName, data.Password));
 
-            var token = this._tokenGenerator.GenerateToken(new TokenUser { UserName = authenticatedUser.UserName, Roles = authenticatedUser.Roles });
+            var token = this._tokenGenerator.GenerateToken(new TokenUser { Id = authenticatedUser.Id, UserName = authenticatedUser.UserName, Roles = authenticatedUser.Roles });
 
             return this.Ok(new LoginResponse { Token = token, User = authenticatedUser });
         }

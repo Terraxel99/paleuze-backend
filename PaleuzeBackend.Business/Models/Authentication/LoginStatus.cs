@@ -5,5 +5,6 @@
         Success = 1,
         Failure = 2,
         LockedOut = 3,
+        NotApproved = 4,
     }
 }

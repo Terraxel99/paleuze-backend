@@ -1,4 +1,5 @@
-﻿using PaleuzeBackend.Business.Interfaces;
+﻿using PaleuzeBackend.Business.Exceptions.Authentication;
+using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Repositories;
 
@@ -19,7 +20,7 @@ namespace PaleuzeBackend.Business.Services
 
             if (!success)
             {
-                throw new InvalidOperationException(); // TODO: Custom exception.
+                throw new UserAlreadyExistsException(username);
             }
         }
 
@@ -29,7 +30,7 @@ namespace PaleuzeBackend.Business.Services
 
             if (user is null || !user.Roles.Any())
             {
-                throw new InvalidOperationException(); // TODO: Custom exception.
+                throw new UserNotFoundException(username);
             }
 
             var result = await this._authenticationRepository.LoginAsync(username, password);
@@ -37,10 +38,10 @@ namespace PaleuzeBackend.Business.Services
             switch (result)
             {
                 case LoginStatus.Failure:
-                    throw new InvalidOperationException(); // TODO: Custom exception.
+                    throw new InvalidCredentialsException();
 
                 case LoginStatus.LockedOut:
-                    throw new InvalidOperationException(); // TODO: Custom exception.
+                    throw new UserLockedOutException(username);
             }
 
             return user;
@@ -50,5 +51,18 @@ namespace PaleuzeBackend.Business.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task ApproveUserAsync(Guid userId)
+        {
+            var success = await this._authenticationRepository.ApproveUserAsync(userId);
+
+            if (!success)
+            {
+                throw new UserNotFoundException(userId);
+            }
+        }
+
+        public async Task<IEnumerable<User>> GetPendingApprovalUsersAsync()
+            => await this._authenticationRepository.GetPendingApprovalUsersAsync();
     }
 }

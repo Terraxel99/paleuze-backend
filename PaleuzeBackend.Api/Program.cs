@@ -1,4 +1,5 @@
 using PaleuzeBackend.Api.Configuration;
+using PaleuzeBackend.Api.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,9 @@ builder.Services.AddBusinessServices();
 builder.Services.AddDatabaseProvider(builder.Configuration);
 builder.Services.AddCustomAuthentication(builder.Configuration);
 builder.Services.AddModelMapping(builder.Configuration);
+
+builder.Services.AddExceptionHandler<ExceptionHandlerMiddleware>();
+builder.Services.AddProblemDetails();
 
 if (builder.Environment.IsDevelopment())
 {
@@ -41,5 +45,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseExceptionHandler();
 
 app.Run();

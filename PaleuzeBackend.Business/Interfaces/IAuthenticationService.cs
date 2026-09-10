@@ -7,5 +7,7 @@ namespace PaleuzeBackend.Business.Interfaces
         Task<User> LoginAsync(string username, string password);
         Task RegisterAsync(string username, string password);
         Task LogoutAsync();
+        Task ApproveUserAsync(Guid userId);
+        Task<IEnumerable<User>> GetPendingApprovalUsersAsync();
     }
 }

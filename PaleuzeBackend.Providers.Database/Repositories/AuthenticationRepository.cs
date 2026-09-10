@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 using PaleuzeBackend.Business.Extensions;
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Models.Authentication;
@@ -12,10 +14,14 @@ namespace PaleuzeBackend.Providers.Database.Repositories
     public class AuthenticationRepository : IAuthenticationRepository
     {
         private readonly UserManager<UserEntity> _userManager;
+        private readonly IMapper _mapper;
 
-        public AuthenticationRepository(UserManager<UserEntity> userManager)
+        public AuthenticationRepository(
+            UserManager<UserEntity> userManager,
+            IMapper mapper)
         {
             this._userManager = userManager;
+            this._mapper = mapper;
         }
 
         public async Task<User?> GetUserByUsernameAsync(string username)
@@ -46,11 +52,9 @@ namespace PaleuzeBackend.Providers.Database.Repositories
                 return false;
             }
 
-            var userEntity = new UserEntity { UserName = username };
+            // User is not approved by default and needs to be approved by admin later.
+            var userEntity = new UserEntity { UserName = username, IsApproved = false };
             var result = await this._userManager.CreateAsync(userEntity, password);
-
-            // TODO: Change, no role set by default and Admin gives roles to people by specific endpoint.
-            await this._userManager.AddToRoleAsync(userEntity, UserRole.Admin.ToRoleName()); 
 
             return result.Succeeded;
         }
@@ -62,6 +66,11 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             if (user is null)
             {
                 return LoginStatus.Failure;
+            }
+
+            if (!user.IsApproved)
+            {
+                return LoginStatus.NotApproved;
             }
 
             if (await this._userManager.IsLockedOutAsync(user))
@@ -82,6 +91,36 @@ namespace PaleuzeBackend.Providers.Database.Repositories
 
             await this._userManager.ResetAccessFailedCountAsync(user); // Resets counter of attempts to 0.
             return LoginStatus.Success;
+        }
+
+        public async Task<bool> ApproveUserAsync(Guid userId)
+        {
+            var user = await this._userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user is null)
+            {
+                return false;
+            }
+
+            if (user.IsApproved)
+            {
+                return true;
+            }
+
+            user.IsApproved = true;
+            await this._userManager.UpdateAsync(user);
+
+            return true;
+        }
+
+        public async Task<IEnumerable<User>> GetPendingApprovalUsersAsync()
+        {
+            var users = await this._userManager.Users
+                .AsNoTracking()
+                .Where(u => !u.IsApproved)
+                .ToListAsync();
+
+            return this._mapper.Map<IEnumerable<User>>(users);
         }
     }
 }

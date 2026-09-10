@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 using System.Text;
@@ -12,6 +13,11 @@ namespace PaleuzeBackend.Api.Configuration
         public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, ConfigurationManager configuration)
         {
             services.Configure<TokenSettings>(configuration.GetSection("Jwt"));
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>

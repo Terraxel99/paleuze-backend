@@ -18,6 +18,7 @@ namespace PaleuzeBackend.Api.Authentication
         {
             var claims = new List<Claim>
             {
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.UniqueName, user.UserName),
             };
 

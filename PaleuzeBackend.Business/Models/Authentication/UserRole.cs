@@ -1,10 +1,9 @@
 ﻿namespace PaleuzeBackend.Business.Models.Authentication
 {
-    public enum UserRole
+    public static class UserRole
     {
-        Unknown = 0,
-        Admin = 1,
-        TournamentManager = 2,
-        TournamentViewer = 3
+        public const string Admin = "Admin";
+        public const string TournamentManager = "TournamentManager";
+        public const string TournamentViewer = "TournamentViewer";
     }
 }
