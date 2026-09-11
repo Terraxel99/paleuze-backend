@@ -27,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="../PaleuzeBackend.Providers.Database/PaleuzeBackend.Providers.Database.csproj" />
     <ProjectReference Include="..\PaleuzeBackend.Business\PaleuzeBackend.Business.csproj" />
+    <ProjectReference Include="..\PaleuzeBackend.Providers.Security\PaleuzeBackend.Providers.Security.csproj" />
   </ItemGroup>
 
 </Project>

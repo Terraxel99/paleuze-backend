@@ -3,14 +3,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using PaleuzeBackend.Api.Authentication;
 using PaleuzeBackend.Api.Models;
-using PaleuzeBackend.Business.Extensions;
+
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models.Authentication;
-using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Claims;
 
 namespace PaleuzeBackend.Api.Controllers
 {
@@ -18,18 +14,16 @@ namespace PaleuzeBackend.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly TokenGenerator _tokenGenerator;
-        private readonly IAuthenticationService _authenticationService;
+        private const string REFRESHTOKEN_COOKIE_NAME = "refreshToken";
 
+        private readonly IAuthenticationService _authenticationService;
         private readonly IMapper _mapper;
 
         public AuthController(
             IAuthenticationService authenticationService,
-            TokenGenerator tokenGenerator,
             IMapper mapper)
         {
             this._authenticationService = authenticationService;
-            this._tokenGenerator = tokenGenerator;
             this._mapper = mapper;
         }
 
@@ -66,19 +60,35 @@ namespace PaleuzeBackend.Api.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<LoginResponse>> Login([FromBody]LoginRequest data)
         {
-            var authenticatedUser = this._mapper.Map<UserResponse>(
-                await this._authenticationService.LoginAsync(data.UserName, data.Password));
+            var login = await this._authenticationService.LoginAsync(data.UserName, data.Password);
+            var user = this._mapper.Map<UserResponse>(login.User);
 
-            var token = this._tokenGenerator.GenerateToken(new TokenUser { Id = authenticatedUser.Id, UserName = authenticatedUser.UserName, Roles = authenticatedUser.Roles });
+            this.SetRefreshTokenCookie(login.RefreshToken, login.RefreshTokenExpiry);
 
-            return this.Ok(new LoginResponse { Token = token, User = authenticatedUser });
+            return this.Ok(new LoginResponse { Token = login.AccessToken, User = user });
         }
 
         [HttpPost("logout")]
         [Authorize]
         public async Task<ActionResult> Logout()
         {
-            return this.NotFound();
+            return this.NotFound(); // TODO : Implement.
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken, DateTime expiry)
+        {
+            this.Response.Cookies.Append(
+                REFRESHTOKEN_COOKIE_NAME,
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = expiry,
+                    Path = "/api/auth",
+                }
+            );
         }
     }
 }

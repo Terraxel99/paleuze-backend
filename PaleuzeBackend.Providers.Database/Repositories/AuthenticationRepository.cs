@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-using PaleuzeBackend.Business.Extensions;
 using PaleuzeBackend.Business.Models;
-using PaleuzeBackend.Business.Models.Authentication;
 using PaleuzeBackend.Business.Repositories;
-
+using PaleuzeBackend.Providers.Database.Data;
 using PaleuzeBackend.Providers.Database.Entities;
 
 namespace PaleuzeBackend.Providers.Database.Repositories
@@ -14,13 +12,16 @@ namespace PaleuzeBackend.Providers.Database.Repositories
     public class AuthenticationRepository : IAuthenticationRepository
     {
         private readonly UserManager<UserEntity> _userManager;
+        private readonly TournamentDbContext _database;
         private readonly IMapper _mapper;
 
         public AuthenticationRepository(
             UserManager<UserEntity> userManager,
+            TournamentDbContext dbContext,
             IMapper mapper)
         {
             this._userManager = userManager;
+            this._database = dbContext;
             this._mapper = mapper;
         }
 
@@ -89,8 +90,16 @@ namespace PaleuzeBackend.Providers.Database.Repositories
                     LoginStatus.Failure;
             }
 
+            // Generate token
+            // Generate refresh token and store it in db.
+
             await this._userManager.ResetAccessFailedCountAsync(user); // Resets counter of attempts to 0.
             return LoginStatus.Success;
+        }
+
+        public async Task LogoutAsync(string userId)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<bool> ApproveUserAsync(Guid userId)
@@ -121,6 +130,27 @@ namespace PaleuzeBackend.Providers.Database.Repositories
                 .ToListAsync();
 
             return this._mapper.Map<IEnumerable<User>>(users);
+        }
+
+        public async Task CreateRefreshTokenAsync(Guid userId, string hashedRefreshToken, DateTime expiryDate, DateTime maxCumulatedExpiry)
+        {
+            var entity = new RefreshTokenEntity
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                TokenHash = hashedRefreshToken,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = expiryDate,
+                AbsoluteExpiresAt = maxCumulatedExpiry,
+            };
+
+            await this._database.RefreshTokens.AddAsync(entity);
+            await this._database.SaveChangesAsync();
+        }
+
+        public async Task RotateRefreshTokenAsync(string hashedRefreshToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

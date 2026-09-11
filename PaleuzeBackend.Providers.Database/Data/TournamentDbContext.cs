@@ -12,6 +12,7 @@ namespace PaleuzeBackend.Providers.Database.Data
             : base(options)
         { }
 
+        public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
         public DbSet<TournamentEntity> Tournaments => Set<TournamentEntity>();
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -19,6 +20,7 @@ namespace PaleuzeBackend.Providers.Database.Data
             base.OnModelCreating(builder);
 
             builder.EnsureRolesInDatabase();
+            builder.CheckRefreshTokenConstraints();
         }
     }
 }

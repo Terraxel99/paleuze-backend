@@ -1,6 +1,6 @@
-﻿namespace PaleuzeBackend.Api.Authentication
+﻿namespace PaleuzeBackend.Business.Security
 {
-    public class TokenSettings
+    public class JwtSettings
     {
         public string Secret { get; set; } = default!;
         public string Issuer { get; set; } = default!;

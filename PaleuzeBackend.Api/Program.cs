@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using PaleuzeBackend.Api.Configuration;
 using PaleuzeBackend.Api.Middleware;
 
@@ -13,7 +14,8 @@ builder.Services.AddOpenApi();
 // Injecting custom services before building the app.
 builder.Services.AddBusinessServices();
 builder.Services.AddDatabaseProvider(builder.Configuration);
-builder.Services.AddCustomAuthentication(builder.Configuration);
+builder.Services.AddSecurityProvider(builder.Configuration);
+
 builder.Services.AddModelMapping(builder.Configuration);
 
 builder.Services.AddExceptionHandler<ExceptionHandlerMiddleware>();

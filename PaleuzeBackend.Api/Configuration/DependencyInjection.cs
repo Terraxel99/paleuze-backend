@@ -1,10 +1,14 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using PaleuzeBackend.Api.Authentication;
 using PaleuzeBackend.Api.Mapping;
-
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Services;
-
 using PaleuzeBackend.Providers.Database;
 using PaleuzeBackend.Providers.Database.Mapping;
+using PaleuzeBackend.Providers.Security.Configuration;
+using System.Text;
 
 namespace PaleuzeBackend.Api.Configuration
 {
@@ -22,6 +26,12 @@ namespace PaleuzeBackend.Api.Configuration
 
         public static IServiceCollection AddDatabaseProvider(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
+            });
+
             var connectionString = configuration.GetConnectionString(DB_CONNSTRING);
 
             if (string.IsNullOrWhiteSpace(connectionString))
@@ -32,6 +42,12 @@ namespace PaleuzeBackend.Api.Configuration
             services.AddDatabaseProvider(connectionString);
             services.AddRepositories();
 
+            return services;
+        }
+
+        public static IServiceCollection AddSecurityProvider(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddSecurityProvider(configuration);
             return services;
         }
 
