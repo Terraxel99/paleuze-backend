@@ -8,7 +8,7 @@ namespace PaleuzeBackend.Business.Interfaces
         Task RegisterAsync(string username, string password);
         Task<UserToken> LoginAsync(string username, string password);
         Task LogoutAsync();
-        Task RefreshAsync(string refreshToken);
+        Task<UserToken> RefreshAsync(string refreshToken);
         Task ApproveUserAsync(Guid userId);
         Task<IEnumerable<User>> GetPendingApprovalUsersAsync();
     }

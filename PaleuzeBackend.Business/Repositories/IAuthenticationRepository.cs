@@ -1,4 +1,5 @@
 ﻿using PaleuzeBackend.Business.Models;
+using PaleuzeBackend.Business.Models.Authentication;
 
 namespace PaleuzeBackend.Business.Repositories
 {
@@ -7,8 +8,9 @@ namespace PaleuzeBackend.Business.Repositories
         Task<User?> GetUserByUsernameAsync(string username);
         Task<LoginStatus> LoginAsync(string username, string password);
         Task LogoutAsync(string userId);
-        Task CreateRefreshTokenAsync(Guid userId, string hashedRefreshToken, DateTime expiryDate, DateTime maxCumulatedExpiry);
-        Task RotateRefreshTokenAsync(string hashedRefreshToken);
+        Task<Guid> CreateRefreshTokenAsync(RefreshToken refreshToken);
+        Task RotateRefreshTokenAsync(RefreshToken newToken);
+        Task<User?> GetUserByValidRefreshTokenAsync(string hashedRefreshToken);
         Task<bool> RegisterAsync(string username, string password);
         Task<bool> ApproveUserAsync(Guid userId);
         Task<IEnumerable<User>> GetPendingApprovalUsersAsync();

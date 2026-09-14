@@ -18,7 +18,7 @@ namespace PaleuzeBackend.Providers.Security.Configuration
         private const string REFRESHTOKENS_CONFIG_SECTION_NAME = "RefreshTokens";
 
 
-        public static void AddSecurity(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddSecurity(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<JwtSettings>(configuration.GetSection(JWT_CONFIG_SECTION_NAME));
             services.Configure<RefreshTokensSettings>(configuration.GetSection(REFRESHTOKENS_CONFIG_SECTION_NAME));
@@ -43,6 +43,8 @@ namespace PaleuzeBackend.Providers.Security.Configuration
             // Add exposed services/repos :
             services.AddScoped<ITokenRepository, TokenProvider>();
             services.AddScoped<IHashingRepository, HashingRepository>();
+
+            return services;
         }
     }
 }

@@ -1,9 +1,11 @@
-﻿namespace PaleuzeBackend.Business.Exceptions.Authentication
+﻿using PaleuzeBackend.Business.Models;
+
+namespace PaleuzeBackend.Business.Exceptions.Authentication
 {
-    internal class UserNotApprovedException : PaleuzeException
+    public class UserNotApprovedException : PaleuzeException
     {
-        public UserNotApprovedException(string username) 
-            : base($"User \"{username}\" is not approved by administrator.")
+        public UserNotApprovedException(User user) 
+            : base($"User \"{user.UserName}\" is not approved by administrator.")
         { }
     }
 }

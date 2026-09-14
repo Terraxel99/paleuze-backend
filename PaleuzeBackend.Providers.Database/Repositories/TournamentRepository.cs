@@ -37,12 +37,7 @@ namespace PaleuzeBackend.Providers.Database.Repositories
         {
             var entity = await this._dbContext.Tournaments
                 .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == id);
-            
-            if (entity is null)
-            {
-                throw new KeyNotFoundException();
-            }
+                .SingleOrDefaultAsync(t => t.Id == id);
 
             return this._mapper.Map<Tournament>(entity);
         }

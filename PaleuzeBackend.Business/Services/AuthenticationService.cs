@@ -55,23 +55,22 @@ namespace PaleuzeBackend.Business.Services
                     throw new InvalidCredentialsException();
 
                 case LoginStatus.LockedOut:
-                    throw new UserLockedOutException(username);
+                    throw new UserLockedOutException(user);
+
+                case LoginStatus.NotApproved:
+                    throw new UserNotApprovedException(user);
             }
 
-            var accessToken = this._tokenRepository.GenerateAccessToken(user);
-            
-            var refreshToken = this._tokenRepository.GenerateRandomRefreshToken();
-            var hashedRefreshToken = await this._hashingRepository.SHA256HashAsync(refreshToken);
-            var refreshTokenExpiry = DateTime.UtcNow.AddDays(this._refreshTokenSettings.RefreshTokenExpiryDays);
-            var refreshTokenMaxCumulatedExpiry = DateTime.UtcNow.AddDays(this._refreshTokenSettings.RefreshTokenMaximumCombinedSessionDays);
+            var accessToken = this._tokenRepository.SignAccessToken(user);
+            var refreshToken = await this._tokenRepository.GenerateRandomRefreshTokenAsync(user.Id);
 
-            await this._authenticationRepository.CreateRefreshTokenAsync(user.Id, hashedRefreshToken, refreshTokenExpiry, refreshTokenMaxCumulatedExpiry);
+            await this._authenticationRepository.CreateRefreshTokenAsync(refreshToken);
 
-            return new UserToken 
-            { 
+            return new UserToken
+            {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken,
-                RefreshTokenExpiry = refreshTokenExpiry,
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiry = refreshToken.ExpiresAt,
                 User = user
             };
         }
@@ -81,14 +80,36 @@ namespace PaleuzeBackend.Business.Services
             throw new NotImplementedException(); // TODO : Handle refresh active token(s).
         }
 
-        public async Task RefreshAsync(string refreshToken)
+        public async Task<UserToken> RefreshAsync(string refreshToken)
         {
-            // Check if refresh token is still valid.
-            // If not, then : ça dégage.
+            var oldRefreshTokenHashed = await this._hashingRepository.SHA256HashAsync(refreshToken);
+            var user = await this._authenticationRepository.GetUserByValidRefreshTokenAsync(oldRefreshTokenHashed);
 
-            // If valid
-            // We generate a new access token.
-            // We ROTATE refresh token with a newly generated one. (provider hashes! )
+            if (user is null)
+            {
+                throw new InvalidRefreshTokenException(refreshToken);
+            }
+
+            if (!user.IsApproved)
+            {
+                throw new UserNotApprovedException(user);
+            }
+
+            var newAccessToken = this._tokenRepository.SignAccessToken(user);
+            var newRefreshToken = await this._tokenRepository.GenerateRandomRefreshTokenAsync(user.Id);
+
+            await this._authenticationRepository.RotateRefreshTokenAsync(newRefreshToken);
+
+            // TODO :
+            // 1 - Model could be better with refreshtoken and expiry in single object
+            // 2 - Sliding and total expiry ?
+            return new UserToken
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken.Token,
+                RefreshTokenExpiry = newRefreshToken.ExpiresAt, 
+                User = user,
+            };
         }
 
         public async Task ApproveUserAsync(Guid userId)

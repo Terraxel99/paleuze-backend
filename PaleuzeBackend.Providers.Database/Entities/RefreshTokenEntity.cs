@@ -9,7 +9,7 @@
         public DateTime ExpiresAt { get; set; }
         public DateTime AbsoluteExpiresAt { get; set; }
         public DateTime? RevokedAt { get; set; }
-        public string? ReplacedByTokenHash { get; set; }
+        public Guid? ReplacedByTokenId { get; set; }
         public UserEntity User { get; set; } = null!;
     }
 }

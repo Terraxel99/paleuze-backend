@@ -1,4 +1,6 @@
-﻿namespace PaleuzeBackend.Business.Exceptions.Authentication
+﻿using PaleuzeBackend.Business.Models;
+
+namespace PaleuzeBackend.Business.Exceptions.Authentication
 {
     public class UserNotFoundException : PaleuzeException
     {
@@ -8,6 +10,10 @@
 
         public UserNotFoundException(Guid userId)
             : base($"User with ID \"{userId}\" does not exist.") 
+        { }
+
+        public UserNotFoundException(User user)
+            : this(user.UserName)
         { }
     }
 }

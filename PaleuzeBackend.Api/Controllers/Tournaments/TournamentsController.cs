@@ -1,10 +1,13 @@
 using AutoMapper;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PaleuzeBackend.Api.Authentication;
 using PaleuzeBackend.Api.Models;
 
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models;
+using PaleuzeBackend.Business.Models.Authentication;
 
 namespace PaleuzeBackend.Api.Controllers.Tournaments
 {
@@ -25,7 +28,7 @@ namespace PaleuzeBackend.Api.Controllers.Tournaments
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<TournamentResponse>>> Get()
         {
             var tournaments = await this._tournamentService.GetAllAsync();
@@ -43,6 +46,7 @@ namespace PaleuzeBackend.Api.Controllers.Tournaments
         }
 
         [HttpPost]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager)]
         public async Task<ActionResult<Guid>> Create(TournamentRequest tournament)
         {
             var guid = await this._tournamentService.CreateAsync(this._mapper.Map<Tournament>(tournament));
@@ -51,6 +55,7 @@ namespace PaleuzeBackend.Api.Controllers.Tournaments
         }
 
         [HttpPut("{id:guid}")]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager)]
         public async Task<ActionResult> Update(Guid id, [FromBody]TournamentRequest tournament)
         {
             await this._tournamentService.UpdateAsync(id, this._mapper.Map<Tournament>(tournament));
@@ -59,6 +64,7 @@ namespace PaleuzeBackend.Api.Controllers.Tournaments
         }
 
         [HttpDelete]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager)]
         public async Task<ActionResult> Delete(Guid id)
         {
             await this._tournamentService.DeleteAsync(id);

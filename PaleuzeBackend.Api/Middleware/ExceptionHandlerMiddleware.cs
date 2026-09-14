@@ -14,6 +14,11 @@ namespace PaleuzeBackend.Api.Middleware
                 UserLockedOutException => StatusCodes.Status403Forbidden,
                 UserNotFoundException => StatusCodes.Status404NotFound,
                 UserAlreadyExistsException => StatusCodes.Status409Conflict,
+                UserNotApprovedException => StatusCodes.Status403Forbidden,
+
+                TournamentNotFoundException => StatusCodes.Status404NotFound,
+
+                InvalidRefreshTokenException => StatusCodes.Status401Unauthorized,
 
                 _ => 0,
             };

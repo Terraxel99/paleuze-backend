@@ -9,6 +9,7 @@ using System.Text;
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Repositories;
 using PaleuzeBackend.Business.Security;
+using PaleuzeBackend.Business.Models.Authentication;
 
 namespace PaleuzeBackend.Providers.Security.Services.Tokens
 {
@@ -16,13 +17,21 @@ namespace PaleuzeBackend.Providers.Security.Services.Tokens
     {
         private const int REFRESH_TOKEN_BYTES_LENGTH = 64;
 
-
+        private readonly IHashingRepository _hashingRepository;
+        private readonly RefreshTokensSettings _refreshTokensSettings;
         private readonly JwtSettings _jwtSettings;
 
-        public TokenProvider(IOptions<JwtSettings> settings)
-            => this._jwtSettings = settings.Value;
+        public TokenProvider(
+            IHashingRepository hashingRepository,
+            IOptions<RefreshTokensSettings> refreshTokensSettings,
+            IOptions<JwtSettings> jwtSettings)
+        {
+            this._hashingRepository = hashingRepository;
+            this._refreshTokensSettings = refreshTokensSettings.Value;
+            this._jwtSettings = jwtSettings.Value;
+        }
 
-        public string GenerateAccessToken(User user)
+        public string SignAccessToken(User user)
         {
             var claims = new List<Claim>
             {
@@ -46,10 +55,20 @@ namespace PaleuzeBackend.Providers.Security.Services.Tokens
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateRandomRefreshToken()
+        public async Task<RefreshToken> GenerateRandomRefreshTokenAsync(Guid userId)
         {
             var bytes = RandomNumberGenerator.GetBytes(REFRESH_TOKEN_BYTES_LENGTH);
-            return Convert.ToBase64String(bytes);
+            var token = Convert.ToBase64String(bytes);
+
+            return new RefreshToken
+            {
+                UserId = userId,
+                Token = token,
+                TokenHash = await this._hashingRepository.SHA256HashAsync(token),
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddDays(this._refreshTokensSettings.RefreshTokenExpiryDays),
+                AbsoluteExpiresAt = DateTime.UtcNow.AddDays(this._refreshTokensSettings.RefreshTokenMaximumCombinedSessionDays),
+            };
         }
     }
 }

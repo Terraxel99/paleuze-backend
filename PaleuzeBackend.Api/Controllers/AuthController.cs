@@ -35,7 +35,7 @@ namespace PaleuzeBackend.Api.Controllers
             return this.Ok(users);
         }
 
-        [HttpPatch]
+        [HttpPatch("{id:guid}/approve")]
         [Authorize(Roles = UserRole.Admin)]
         public async Task<ActionResult> ApproveUser(Guid userId)
         {
@@ -68,11 +68,39 @@ namespace PaleuzeBackend.Api.Controllers
             return this.Ok(new LoginResponse { Token = login.AccessToken, User = user });
         }
 
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<ActionResult<LoginResponse>> Refresh()
+        {
+            var cookie = this.GetRefreshTokenCookie();
+
+            if (string.IsNullOrWhiteSpace(cookie))
+            {
+                return this.BadRequest();
+            }
+
+            var login = await this._authenticationService.RefreshAsync(cookie);
+            this.SetRefreshTokenCookie(login.RefreshToken, login.RefreshTokenExpiry);
+
+            return this.Ok(new LoginResponse
+            {
+                Token = login.AccessToken,
+                User = this._mapper.Map<UserResponse>(login.User),
+            });
+        }
+
         [HttpPost("logout")]
         [Authorize]
         public async Task<ActionResult> Logout()
         {
             return this.NotFound(); // TODO : Implement.
+        }
+
+        private string GetRefreshTokenCookie()
+        {
+            var found = this.Request.Cookies.TryGetValue(REFRESHTOKEN_COOKIE_NAME, out var refreshToken);
+
+            return found ? refreshToken! : string.Empty;
         }
 
         private void SetRefreshTokenCookie(string refreshToken, DateTime expiry)
@@ -90,5 +118,8 @@ namespace PaleuzeBackend.Api.Controllers
                 }
             );
         }
+
+        private void DeleteRefreshTokenCookie()
+            => this.Response.Cookies.Delete(REFRESHTOKEN_COOKIE_NAME);
     }
 }

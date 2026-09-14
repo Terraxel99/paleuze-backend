@@ -1,3 +1,4 @@
+using PaleuzeBackend.Business.Exceptions.Authentication;
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Repositories;
@@ -20,7 +21,8 @@ namespace PaleuzeBackend.Business.Services
 
         public async Task<Tournament> GetByIdAsync(Guid id)
         {
-            return await this._tournamentRepository.GetByIdAsync(id);
+            return await this._tournamentRepository.GetByIdAsync(id)
+                ?? throw new TournamentNotFoundException(id);
         }
 
         public async Task<Guid> CreateAsync(Tournament tournament)

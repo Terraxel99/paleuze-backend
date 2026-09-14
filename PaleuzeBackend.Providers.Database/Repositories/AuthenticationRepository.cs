@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using PaleuzeBackend.Business.Models;
+using PaleuzeBackend.Business.Models.Authentication;
 using PaleuzeBackend.Business.Repositories;
 using PaleuzeBackend.Providers.Database.Data;
 using PaleuzeBackend.Providers.Database.Entities;
@@ -36,25 +37,22 @@ namespace PaleuzeBackend.Providers.Database.Repositories
 
             var roles = await this._userManager.GetRolesAsync(user);
 
-            return new User
-            {
-                Id = user.Id,
-                UserName = user.UserName ?? string.Empty,
-                Roles = roles,
-            };
+            var model = this._mapper.Map<User>(user);
+            model.Roles = roles;
+            
+            return model;
         }
 
         public async Task<bool> RegisterAsync(string username, string password)
         {
-            var existing = await this._userManager.Users.AnyAsync(u => u.UserName == username);
-
-            if (existing)
-            {
-                return false;
-            }
-
             // User is not approved by default and needs to be approved by admin later.
-            var userEntity = new UserEntity { UserName = username, IsApproved = false };
+            var userEntity = new UserEntity
+            { 
+                Id = Guid.NewGuid(), 
+                UserName = username,
+                IsApproved = false 
+            };
+
             var result = await this._userManager.CreateAsync(userEntity, password);
 
             return result.Succeeded;
@@ -90,9 +88,6 @@ namespace PaleuzeBackend.Providers.Database.Repositories
                     LoginStatus.Failure;
             }
 
-            // Generate token
-            // Generate refresh token and store it in db.
-
             await this._userManager.ResetAccessFailedCountAsync(user); // Resets counter of attempts to 0.
             return LoginStatus.Success;
         }
@@ -116,9 +111,28 @@ namespace PaleuzeBackend.Providers.Database.Repositories
                 return true;
             }
 
-            user.IsApproved = true;
-            await this._userManager.UpdateAsync(user);
 
+            IdentityResult queryResult;
+            user.IsApproved = true;
+            
+            await using var transaction = await this._database.Database.BeginTransactionAsync();
+
+            queryResult = await this._userManager.UpdateAsync(user);
+
+            if (!queryResult.Succeeded)
+            {
+                return false;
+            }
+
+            // TODO: Adapt this in the future so that we can choose which roles to add.
+            queryResult = await this._userManager.AddToRoleAsync(user, UserRole.TournamentManager);
+
+            if (!queryResult.Succeeded)
+            {
+                return false;
+            }
+
+            await transaction.CommitAsync();
             return true;
         }
 
@@ -132,25 +146,57 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             return this._mapper.Map<IEnumerable<User>>(users);
         }
 
-        public async Task CreateRefreshTokenAsync(Guid userId, string hashedRefreshToken, DateTime expiryDate, DateTime maxCumulatedExpiry)
+        public async Task<Guid> CreateRefreshTokenAsync(RefreshToken refreshToken)
         {
+            // TODO : Mapper ??
             var entity = new RefreshTokenEntity
             {
                 Id = Guid.NewGuid(),
-                UserId = userId,
-                TokenHash = hashedRefreshToken,
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = expiryDate,
-                AbsoluteExpiresAt = maxCumulatedExpiry,
+                UserId = refreshToken.UserId,
+                TokenHash = refreshToken.TokenHash,
+                CreatedAt = refreshToken.ExpiresAt,
+                ExpiresAt = refreshToken.ExpiresAt,
+                AbsoluteExpiresAt = refreshToken.AbsoluteExpiresAt,
             };
 
             await this._database.RefreshTokens.AddAsync(entity);
             await this._database.SaveChangesAsync();
+
+            return entity.Id;
         }
 
-        public async Task RotateRefreshTokenAsync(string hashedRefreshToken)
+        public async Task RotateRefreshTokenAsync(RefreshToken newToken)
         {
-            throw new NotImplementedException();
+            await using var transaction = await this._database.Database.BeginTransactionAsync();
+
+            var newTokenId = await this.CreateRefreshTokenAsync(newToken);
+
+            await this._database.RefreshTokens
+                .Where(rt => rt.UserId == newToken.UserId && rt.RevokedAt == null)
+                .ExecuteUpdateAsync(rt =>
+                {
+                   rt.SetProperty(r => r.RevokedAt, DateTime.UtcNow);
+                   rt.SetProperty(r => r.ReplacedByTokenId, newTokenId);
+                });
+
+            await transaction.CommitAsync();
+        }
+
+        public async Task<User?> GetUserByValidRefreshTokenAsync(string hashedRefreshToken)
+        {
+            var refreshToken = await this._database.RefreshTokens
+                .Include(rt => rt.User)
+                .SingleOrDefaultAsync(rt => rt.TokenHash == hashedRefreshToken);
+
+            if (refreshToken is null)
+            {
+                return default;
+            }
+            
+            var model = this._mapper.Map<User>(refreshToken.User);
+            model.Roles = await this._userManager.GetRolesAsync(refreshToken.User);
+
+            return model;
         }
     }
 }

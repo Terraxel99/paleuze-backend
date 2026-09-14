@@ -1,13 +1,11 @@
-﻿namespace PaleuzeBackend.Business.Exceptions.Authentication
+﻿using PaleuzeBackend.Business.Models;
+
+namespace PaleuzeBackend.Business.Exceptions.Authentication
 {
     public class UserLockedOutException : PaleuzeException
     {
-        public string UserName { get; set; }
-
-        public UserLockedOutException(string username)
-            : base($"User \"\" is locked out.")
-        {
-            this.UserName = username;
-        }
+        public UserLockedOutException(User user)
+            : base($"User \"{user.UserName}\" is locked out.") 
+        { }
     }
 }
