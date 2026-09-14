@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using PaleuzeBackend.Api.Authentication;
 using PaleuzeBackend.Api.Models;
 
 using PaleuzeBackend.Business.Interfaces;
@@ -28,15 +28,15 @@ namespace PaleuzeBackend.Api.Controllers
         }
 
         [HttpGet("pending-approval")]
-        [Authorize(Roles = UserRole.Admin)]
+        [AuthorizeRoles(UserRole.Admin)]
         public async Task<ActionResult<IEnumerable<UserResponse>>> GetPendingApprovalUsers()
         {
             var users = this._mapper.Map<IEnumerable<UserResponse>>(await this._authenticationService.GetPendingApprovalUsersAsync());
             return this.Ok(users);
         }
 
-        [HttpPatch("{id:guid}/approve")]
-        [Authorize(Roles = UserRole.Admin)]
+        [HttpPatch("{userId:guid}/approve")]
+        [AuthorizeRoles(UserRole.Admin)]
         public async Task<ActionResult> ApproveUser(Guid userId)
         {
             if (userId == Guid.Empty)
