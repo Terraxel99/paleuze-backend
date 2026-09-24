@@ -54,7 +54,7 @@ namespace PaleuzeBackend.Api.Configuration
         {
             services.AddAutoMapper(config =>
             {
-                // TODO : config.LicenseKey = configuration.Get("Automapper.License");
+                config.LicenseKey = configuration.GetValue<string>("Automapper.License");
                 config.AddProfile<ApiMappingProfile>();
                 config.AddProfile<DatabaseMappingProfile>();
             });

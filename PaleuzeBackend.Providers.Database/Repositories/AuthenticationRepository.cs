@@ -92,9 +92,18 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             return LoginStatus.Success;
         }
 
-        public async Task LogoutAsync(string userId)
+        public async Task RevokeRefreshTokenAsync(string hashedRefreshToken)
         {
-            throw new NotImplementedException();
+            var refreshToken = await this._database.RefreshTokens
+                .SingleOrDefaultAsync(rt => rt.TokenHash == hashedRefreshToken);
+
+            if (refreshToken is null)
+            {
+                throw new InvalidOperationException();
+            } 
+
+            refreshToken.RevokedAt = DateTime.UtcNow;
+            await this._database.SaveChangesAsync();
         }
 
         public async Task<bool> ApproveUserAsync(Guid userId)
@@ -148,16 +157,7 @@ namespace PaleuzeBackend.Providers.Database.Repositories
 
         public async Task<Guid> CreateRefreshTokenAsync(RefreshToken refreshToken)
         {
-            // TODO : Mapper ??
-            var entity = new RefreshTokenEntity
-            {
-                Id = Guid.NewGuid(),
-                UserId = refreshToken.UserId,
-                TokenHash = refreshToken.TokenHash,
-                CreatedAt = refreshToken.ExpiresAt,
-                ExpiresAt = refreshToken.ExpiresAt,
-                AbsoluteExpiresAt = refreshToken.AbsoluteExpiresAt,
-            };
+            var entity = this._mapper.Map<RefreshTokenEntity>(refreshToken);
 
             await this._database.RefreshTokens.AddAsync(entity);
             await this._database.SaveChangesAsync();

@@ -93,7 +93,18 @@ namespace PaleuzeBackend.Api.Controllers
         [Authorize]
         public async Task<ActionResult> Logout()
         {
-            return this.NotFound(); // TODO : Implement.
+            var refreshToken = this.GetRefreshTokenCookie();
+
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                return this.NoContent();
+            }
+
+
+            await this._authenticationService.LogoutAsync(refreshToken);
+            this.DeleteRefreshTokenCookie();
+            
+            return this.NoContent();
         }
 
         private string GetRefreshTokenCookie()

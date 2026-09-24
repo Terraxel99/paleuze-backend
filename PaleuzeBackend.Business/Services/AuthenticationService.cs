@@ -75,9 +75,10 @@ namespace PaleuzeBackend.Business.Services
             };
         }
 
-        public async Task LogoutAsync()
+        public async Task LogoutAsync(string refreshToken)
         {
-            throw new NotImplementedException(); // TODO : Handle refresh active token(s).
+            var hashedRefreshToken = await this._hashingRepository.SHA256HashAsync(refreshToken);
+            await this._authenticationRepository.RevokeRefreshTokenAsync(hashedRefreshToken);
         }
 
         public async Task<UserToken> RefreshAsync(string refreshToken)
@@ -100,9 +101,9 @@ namespace PaleuzeBackend.Business.Services
 
             await this._authenticationRepository.RotateRefreshTokenAsync(newRefreshToken);
 
-            // TODO :
-            // 1 - Model could be better with refreshtoken and expiry in single object
-            // 2 - Sliding and total expiry ?
+            // TODO: We might want to use sliding expiry as well.
+            // For now we just have an access token valid X minutes and a RT valid Y days.
+            // We might want to have an absolute expiry to RT to have a maximum of possible refreshes.
             return new UserToken
             {
                 AccessToken = newAccessToken,

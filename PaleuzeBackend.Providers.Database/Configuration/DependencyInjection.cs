@@ -22,7 +22,7 @@ namespace PaleuzeBackend.Providers.Database
             services.AddIdentityCore<UserEntity>()
                     .AddRoles<IdentityRole<Guid>>()
                     .AddEntityFrameworkStores<TournamentDbContext>();
-                    // .AddDefaultTokenProviders(); // TODO : Add password reset & MFA.
+                    // .AddDefaultTokenProviders(); // TODO: Add password reset & MFA.
 
             return services;
         }

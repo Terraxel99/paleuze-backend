@@ -7,7 +7,7 @@ namespace PaleuzeBackend.Business.Repositories
     {
         Task<User?> GetUserByUsernameAsync(string username);
         Task<LoginStatus> LoginAsync(string username, string password);
-        Task LogoutAsync(string userId);
+        Task RevokeRefreshTokenAsync(string hashedRefreshToken);
         Task<Guid> CreateRefreshTokenAsync(RefreshToken refreshToken);
         Task RotateRefreshTokenAsync(RefreshToken newToken);
         Task<User?> GetUserByValidRefreshTokenAsync(string hashedRefreshToken);
