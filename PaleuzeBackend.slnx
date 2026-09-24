@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Providers/">
     <Project Path="PaleuzeBackend.Providers.Database/PaleuzeBackend.Providers.Database.csproj" />
+    <Project Path="PaleuzeBackend.Providers.Security/PaleuzeBackend.Providers.Security.csproj" Id="6bce320e-4091-457a-8162-85045e3c09bd" />
   </Folder>
   <Folder Name="/Éléments de solution/">
     <File Path=".dockerignore" />
@@ -8,6 +9,6 @@
     <File Path="docker-compose.dev.yml" />
     <File Path="docker-compose.prod.yml" />
   </Folder>
-  <Project Path="PaleuzeBackend.Business/PaleuzeBackend.Business.csproj" />
   <Project Path="PaleuzeBackend.Api/PaleuzeBackend.Api.csproj" />
+  <Project Path="PaleuzeBackend.Business/PaleuzeBackend.Business.csproj" />
 </Solution>

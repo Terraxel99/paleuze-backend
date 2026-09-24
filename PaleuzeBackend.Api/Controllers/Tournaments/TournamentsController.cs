@@ -1,13 +1,15 @@
 using AutoMapper;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using PaleuzeBackend.Api.Authentication;
 using PaleuzeBackend.Api.Models;
 
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models;
+using PaleuzeBackend.Business.Models.Authentication;
 
-namespace PaleuzeBackend.Api.Controllers
+namespace PaleuzeBackend.Api.Controllers.Tournaments
 {
     [ApiController]
     [Route("[controller]")]
@@ -26,41 +28,46 @@ namespace PaleuzeBackend.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<TournamentResponse>>> Get()
         {
-            var tournaments = await this._tournamentService.GetAll();
+            var tournaments = await this._tournamentService.GetAllAsync();
 
             return this.Ok(this._mapper.Map<IEnumerable<TournamentResponse>>(tournaments));
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize]
         public async Task<ActionResult<TournamentResponse>> Get(Guid id)
         {
-            var tournament = await this._tournamentService.GetById(id);
+            var tournament = await this._tournamentService.GetByIdAsync(id);
 
             return this.Ok(tournament);
         }
 
         [HttpPost]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager)]
         public async Task<ActionResult<Guid>> Create(TournamentRequest tournament)
         {
-            var guid = await this._tournamentService.Create(this._mapper.Map<Tournament>(tournament));
+            var guid = await this._tournamentService.CreateAsync(this._mapper.Map<Tournament>(tournament));
 
             return this.Ok(guid);
         }
 
         [HttpPut("{id:guid}")]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager)]
         public async Task<ActionResult> Update(Guid id, [FromBody]TournamentRequest tournament)
         {
-            await this._tournamentService.Update(id, this._mapper.Map<Tournament>(tournament));
+            await this._tournamentService.UpdateAsync(id, this._mapper.Map<Tournament>(tournament));
 
             return this.NoContent();
         }
 
         [HttpDelete]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await this._tournamentService.Delete(id);
+            await this._tournamentService.DeleteAsync(id);
 
             return this.NoContent();
         }
