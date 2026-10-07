@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaleuzeBackend.Providers.Database.Data;
@@ -11,9 +12,11 @@ using PaleuzeBackend.Providers.Database.Data;
 namespace PaleuzeBackend.Providers.Database.Migrations
 {
     [DbContext(typeof(TournamentDbContext))]
-    partial class TournamentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260902195100_AddIdentity")]
+    partial class AddIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,29 +50,6 @@ namespace PaleuzeBackend.Providers.Database.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("dcff469b-c71a-4bb1-b7b7-8352d2c23b14"),
-                            ConcurrencyStamp = "TournamentViewer",
-                            Name = "TournamentViewer",
-                            NormalizedName = "TOURNAMENTVIEWER"
-                        },
-                        new
-                        {
-                            Id = new Guid("68f33d13-2d34-40ca-a3cd-460c4fc5e7a8"),
-                            ConcurrencyStamp = "TournamentManager",
-                            Name = "TournamentManager",
-                            NormalizedName = "TOURNAMENTMANAGER"
-                        },
-                        new
-                        {
-                            Id = new Guid("46db37fb-1894-4122-a782-2d75aafc1bd1"),
-                            ConcurrencyStamp = "Admin",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -175,44 +155,6 @@ namespace PaleuzeBackend.Providers.Database.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PaleuzeBackend.Providers.Database.Entities.RefreshTokenEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("AbsoluteExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("ReplacedByTokenId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshTokens");
-                });
-
             modelBuilder.Entity("PaleuzeBackend.Providers.Database.Entities.TournamentEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -246,9 +188,6 @@ namespace PaleuzeBackend.Providers.Database.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsApproved")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")
@@ -345,17 +284,6 @@ namespace PaleuzeBackend.Providers.Database.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("PaleuzeBackend.Providers.Database.Entities.RefreshTokenEntity", b =>
-                {
-                    b.HasOne("PaleuzeBackend.Providers.Database.Entities.UserEntity", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

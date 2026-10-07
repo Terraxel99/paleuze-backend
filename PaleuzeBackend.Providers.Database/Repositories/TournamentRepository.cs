@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Repositories;
 
+using PaleuzeBackend.Providers.Database.Data;
 using PaleuzeBackend.Providers.Database.Entities;
 
 namespace PaleuzeBackend.Providers.Database.Repositories
@@ -23,7 +24,7 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             this._mapper = mapper;
         }
 
-        public async Task<IEnumerable<Tournament>> GetAll()
+        public async Task<IEnumerable<Tournament>> GetAllAsync()
         {
             var tournaments = await this._dbContext.Tournaments
                 .AsNoTracking()
@@ -32,21 +33,16 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             return this._mapper.Map<IEnumerable<Tournament>>(tournaments);
         }
 
-        public async Task<Tournament> GetById(Guid id)
+        public async Task<Tournament> GetByIdAsync(Guid id)
         {
             var entity = await this._dbContext.Tournaments
                 .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == id);
-            
-            if (entity is null)
-            {
-                throw new KeyNotFoundException();
-            }
+                .SingleOrDefaultAsync(t => t.Id == id);
 
             return this._mapper.Map<Tournament>(entity);
         }
 
-        public async Task<Guid> Create(Tournament tournament)
+        public async Task<Guid> CreateAsync(Tournament tournament)
         {
             var entity = this._mapper.Map<TournamentEntity>(tournament);
 
@@ -56,7 +52,7 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             return entity.Id;
         }
 
-        public async Task Update(Guid id, Tournament tournament)
+        public async Task UpdateAsync(Guid id, Tournament tournament)
         {
             var entity = await this._dbContext.Tournaments
                 .FirstOrDefaultAsync(t => t.Id == id);
@@ -70,7 +66,7 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             await this._dbContext.SaveChangesAsync();          
         }
 
-        public async Task Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             var entity = await this._dbContext.Tournaments
                 .FindAsync(id);
