@@ -4,6 +4,7 @@ namespace PaleuzeBackend.Business.Repositories
 {
     public interface ITournamentRepository
     {
+        Task<bool> ExistsAsync(Guid tournamentId);
         Task<IEnumerable<Tournament>> GetAllAsync();
         Task<Tournament> GetByIdAsync(Guid id);
         Task<Guid> CreateAsync(Tournament tournament);

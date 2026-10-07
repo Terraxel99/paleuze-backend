@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 
 using PaleuzeBackend.Business.Exceptions.Authentication;
+using PaleuzeBackend.Business.Exceptions.Tournaments;
 
 namespace PaleuzeBackend.Api.Middleware
 {
@@ -17,6 +18,8 @@ namespace PaleuzeBackend.Api.Middleware
                 UserNotApprovedException => StatusCodes.Status403Forbidden,
 
                 TournamentNotFoundException => StatusCodes.Status404NotFound,
+
+                SerieNotFoundException => StatusCodes.Status404NotFound,
 
                 InvalidRefreshTokenException => StatusCodes.Status401Unauthorized,
 

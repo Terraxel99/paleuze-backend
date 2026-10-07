@@ -31,6 +31,7 @@ namespace PaleuzeBackend.Providers.Database
         {
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddScoped<ITournamentRepository, TournamentRepository>();
+            services.AddScoped<ISerieRepository, SerieRepository>();
 
             return services;
         }

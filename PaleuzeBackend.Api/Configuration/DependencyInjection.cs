@@ -23,6 +23,7 @@ namespace PaleuzeBackend.Api.Configuration
         {
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ITournamentService, TournamentService>();
+            services.AddScoped<ISerieService, SerieService>();
 
             return services;
         }
