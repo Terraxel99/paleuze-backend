@@ -14,6 +14,10 @@ namespace PaleuzeBackend.Providers.Database.Mapping
             this.CreateMap<Tournament, TournamentEntity>()
                 .ForMember(model => model.Id, opt => opt.Ignore());
 
+            this.CreateMap<SerieEntity, Serie>();
+            this.CreateMap<Serie, SerieEntity>()
+                .ForMember(model => model.Id, opt => opt.Ignore());
+
             this.CreateMap<UserEntity, User>();
 
             this.CreateMap<RefreshToken, RefreshTokenEntity>()

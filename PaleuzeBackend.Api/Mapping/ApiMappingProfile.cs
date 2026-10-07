@@ -12,6 +12,9 @@ namespace PaleuzeBackend.Api.Mapping
             this.CreateMap<Tournament, TournamentResponse>();
             this.CreateMap<TournamentRequest, Tournament>();
 
+            this.CreateMap<Serie, SerieResponse>();
+            this.CreateMap<SerieRequest, Serie>();
+
             this.CreateMap<User, UserResponse>();
         }
     }

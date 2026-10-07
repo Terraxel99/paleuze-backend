@@ -14,6 +14,7 @@ namespace PaleuzeBackend.Providers.Database.Data
 
         public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
         public DbSet<TournamentEntity> Tournaments => Set<TournamentEntity>();
+        public DbSet<SerieEntity> Series => Set<SerieEntity>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

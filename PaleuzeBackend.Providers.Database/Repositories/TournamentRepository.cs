@@ -12,7 +12,7 @@ namespace PaleuzeBackend.Providers.Database.Repositories
 {
     public class TournamentRepository : ITournamentRepository
     {
-        private TournamentDbContext _dbContext;
+        private TournamentDbContext _database;
         private IMapper _mapper;
 
         public TournamentRepository(
@@ -20,13 +20,13 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             IMapper mapper
         )
         {
-            this._dbContext = dbContext;
+            this._database = dbContext;
             this._mapper = mapper;
         }
 
         public async Task<IEnumerable<Tournament>> GetAllAsync()
         {
-            var tournaments = await this._dbContext.Tournaments
+            var tournaments = await this._database.Tournaments
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -35,7 +35,7 @@ namespace PaleuzeBackend.Providers.Database.Repositories
 
         public async Task<Tournament> GetByIdAsync(Guid id)
         {
-            var entity = await this._dbContext.Tournaments
+            var entity = await this._database.Tournaments
                 .AsNoTracking()
                 .SingleOrDefaultAsync(t => t.Id == id);
 
@@ -46,15 +46,15 @@ namespace PaleuzeBackend.Providers.Database.Repositories
         {
             var entity = this._mapper.Map<TournamentEntity>(tournament);
 
-            await this._dbContext.Tournaments.AddAsync(entity);
-            await this._dbContext.SaveChangesAsync();
+            await this._database.Tournaments.AddAsync(entity);
+            await this._database.SaveChangesAsync();
 
             return entity.Id;
         }
 
         public async Task UpdateAsync(Guid id, Tournament tournament)
         {
-            var entity = await this._dbContext.Tournaments
+            var entity = await this._database.Tournaments
                 .FirstOrDefaultAsync(t => t.Id == id);
                 
             if (entity is null)
@@ -63,12 +63,12 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             }
 
             this._mapper.Map(tournament, entity);
-            await this._dbContext.SaveChangesAsync();          
+            await this._database.SaveChangesAsync();          
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var entity = await this._dbContext.Tournaments
+            var entity = await this._database.Tournaments
                 .FindAsync(id);
 
             if (entity is null)
@@ -76,8 +76,15 @@ namespace PaleuzeBackend.Providers.Database.Repositories
                 throw new KeyNotFoundException();
             }
 
-            this._dbContext.Tournaments.Remove(entity);
-            await this._dbContext.SaveChangesAsync();
+            this._database.Tournaments.Remove(entity);
+            await this._database.SaveChangesAsync();
+        }
+
+        public async Task<bool> ExistsAsync(Guid tournamentId)
+        {
+            return await this._database.Tournaments
+                .AsNoTracking()
+                .AnyAsync(t => t.Id == tournamentId);
         }
     }
 }

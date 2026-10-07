@@ -1,4 +1,4 @@
-using PaleuzeBackend.Business.Exceptions.Authentication;
+using PaleuzeBackend.Business.Exceptions.Tournaments;
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Repositories;

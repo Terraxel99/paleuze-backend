@@ -1,11 +1,8 @@
-﻿using Microsoft.Extensions.Options;
-
-using PaleuzeBackend.Business.Exceptions.Authentication;
+﻿using PaleuzeBackend.Business.Exceptions.Authentication;
 using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Models.Authentication;
 using PaleuzeBackend.Business.Repositories;
-using PaleuzeBackend.Business.Security;
 
 namespace PaleuzeBackend.Business.Services
 {

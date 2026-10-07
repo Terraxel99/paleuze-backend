@@ -1,13 +1,13 @@
 using AutoMapper;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using PaleuzeBackend.Api.Authentication;
 using PaleuzeBackend.Api.Models;
 
-using PaleuzeBackend.Business.Interfaces;
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Models.Authentication;
+using PaleuzeBackend.Business.Interfaces;
 
 namespace PaleuzeBackend.Api.Controllers.Tournaments
 {
@@ -16,19 +16,22 @@ namespace PaleuzeBackend.Api.Controllers.Tournaments
     public class TournamentsController : ControllerBase
     {
         private ITournamentService _tournamentService;
+        private ISerieService _serieService;
         private IMapper _mapper;
 
         public TournamentsController(
             ITournamentService tournamentService,
+            ISerieService serieService,
             IMapper mapper
         )
         {
             this._tournamentService = tournamentService;
+            this._serieService = serieService;
             this._mapper = mapper;
         }
 
         [HttpGet]
-        [Authorize]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager, UserRole.TournamentViewer)]
         public async Task<ActionResult<IEnumerable<TournamentResponse>>> Get()
         {
             var tournaments = await this._tournamentService.GetAllAsync();
@@ -37,12 +40,21 @@ namespace PaleuzeBackend.Api.Controllers.Tournaments
         }
 
         [HttpGet("{id:guid}")]
-        [Authorize]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager, UserRole.TournamentViewer)]
         public async Task<ActionResult<TournamentResponse>> Get(Guid id)
         {
             var tournament = await this._tournamentService.GetByIdAsync(id);
 
             return this.Ok(tournament);
+        }
+
+        [HttpGet("{id:guid}/series")]
+        [AuthorizeRoles(UserRole.Admin, UserRole.TournamentManager, UserRole.TournamentViewer)]
+        public async Task<ActionResult<IEnumerable<SerieResponse>>> GetSeries(Guid id)
+        {
+            var series = await this._serieService.GetAllByTournamentIdAsync(id);
+
+            return this.Ok(this._mapper.Map<IEnumerable<SerieResponse>>(series));
         }
 
         [HttpPost]

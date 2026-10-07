@@ -1,4 +1,4 @@
-namespace PaleuzeBackend.Business.Exceptions.Authentication
+namespace PaleuzeBackend.Business.Exceptions.Tournaments
 {
     public class TournamentNotFoundException : PaleuzeException
     {
