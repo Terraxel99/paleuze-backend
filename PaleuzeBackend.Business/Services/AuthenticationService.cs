@@ -14,18 +14,15 @@ namespace PaleuzeBackend.Business.Services
         private readonly IAuthenticationRepository _authenticationRepository;
         private readonly ITokenRepository _tokenRepository;
         private readonly IHashingRepository _hashingRepository;
-        private readonly RefreshTokensSettings _refreshTokenSettings;
 
         public AuthenticationService(
             IAuthenticationRepository authenticationRepository,
             ITokenRepository tokenRepository,
-            IHashingRepository hashingRepository,
-            IOptions<RefreshTokensSettings> refreshTokenSettings)
+            IHashingRepository hashingRepository)
         {
             this._authenticationRepository = authenticationRepository;
             this._tokenRepository = tokenRepository;
             this._hashingRepository = hashingRepository;
-            this._refreshTokenSettings = refreshTokenSettings.Value;
         }
 
         public async Task RegisterAsync(string username, string password)

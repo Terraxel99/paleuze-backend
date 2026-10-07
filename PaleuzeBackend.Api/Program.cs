@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using PaleuzeBackend.Api.Configuration;
 using PaleuzeBackend.Api.Middleware;
 

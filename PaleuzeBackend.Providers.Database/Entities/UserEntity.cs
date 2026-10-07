@@ -4,6 +4,6 @@ namespace PaleuzeBackend.Providers.Database.Entities
 {
     public sealed class UserEntity : IdentityUser<Guid>
     {
-        public bool IsApproved { get;set; }
+        public bool IsApproved { get; set; }
     }
 }

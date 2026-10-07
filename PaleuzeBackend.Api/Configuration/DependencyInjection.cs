@@ -13,7 +13,11 @@ namespace PaleuzeBackend.Api.Configuration
 {
     public static class DependencyInjection
     {
-        private const string DB_CONNSTRING = "Database";
+        private const string DB_CONNSTRING_CONFIG_KEY = "Database";
+        private const string AUTOMAPPER_LICENSE_CONFIG_KEY = "Automapper.License";
+        private const string ASPNET_IDENTITY_CONFIG_KEY = "Identity";
+        
+
 
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
@@ -25,17 +29,13 @@ namespace PaleuzeBackend.Api.Configuration
 
         public static IServiceCollection AddDatabaseProvider(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
-            });
+            services.Configure<IdentityOptions>(configuration.GetSection(ASPNET_IDENTITY_CONFIG_KEY));
 
-            var connectionString = configuration.GetConnectionString(DB_CONNSTRING);
+            var connectionString = configuration.GetConnectionString(DB_CONNSTRING_CONFIG_KEY);
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                throw new InvalidOperationException($"Empty connection string \"{DB_CONNSTRING}\" is not allowed.");
+                throw new InvalidOperationException($"Empty connection string \"{DB_CONNSTRING_CONFIG_KEY}\" is not allowed.");
             }
 
             services.AddDatabaseProvider(connectionString);
@@ -54,7 +54,7 @@ namespace PaleuzeBackend.Api.Configuration
         {
             services.AddAutoMapper(config =>
             {
-                config.LicenseKey = configuration.GetValue<string>("Automapper.License");
+                config.LicenseKey = configuration.GetValue<string>(AUTOMAPPER_LICENSE_CONFIG_KEY);
                 config.AddProfile<ApiMappingProfile>();
                 config.AddProfile<DatabaseMappingProfile>();
             });

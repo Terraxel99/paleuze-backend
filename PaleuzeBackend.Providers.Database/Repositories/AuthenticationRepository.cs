@@ -50,7 +50,7 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             { 
                 Id = Guid.NewGuid(), 
                 UserName = username,
-                IsApproved = false 
+                IsApproved = false,
             };
 
             var result = await this._userManager.CreateAsync(userEntity, password);
@@ -119,7 +119,6 @@ namespace PaleuzeBackend.Providers.Database.Repositories
             {
                 return true;
             }
-
 
             IdentityResult queryResult;
             user.IsApproved = true;
