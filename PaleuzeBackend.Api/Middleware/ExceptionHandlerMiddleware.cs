@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
-
+using PaleuzeBackend.Business.Exceptions;
 using PaleuzeBackend.Business.Exceptions.Authentication;
 
 namespace PaleuzeBackend.Api.Middleware
@@ -10,15 +10,14 @@ namespace PaleuzeBackend.Api.Middleware
         {
             var status = exception switch
             {
+                InvalidRefreshTokenException => StatusCodes.Status401Unauthorized,
                 InvalidCredentialsException => StatusCodes.Status401Unauthorized,
                 UserLockedOutException => StatusCodes.Status403Forbidden,
                 UserNotFoundException => StatusCodes.Status404NotFound,
                 UserAlreadyExistsException => StatusCodes.Status409Conflict,
                 UserNotApprovedException => StatusCodes.Status403Forbidden,
 
-                TournamentNotFoundException => StatusCodes.Status404NotFound,
-
-                InvalidRefreshTokenException => StatusCodes.Status401Unauthorized,
+                PaleuzeNotFoundException => StatusCodes.Status404NotFound,
 
                 _ => 0,
             };

@@ -1,5 +1,7 @@
+using PaleuzeBackend.Api.Authentication;
 using PaleuzeBackend.Api.Configuration;
 using PaleuzeBackend.Api.Middleware;
+using PaleuzeBackend.Business.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,9 @@ builder.Services.AddDatabaseProvider(builder.Configuration);
 builder.Services.AddSecurityProvider(builder.Configuration);
 
 builder.Services.AddModelMapping(builder.Configuration);
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUserAccessor>();
 
 builder.Services.AddExceptionHandler<ExceptionHandlerMiddleware>();
 builder.Services.AddProblemDetails();

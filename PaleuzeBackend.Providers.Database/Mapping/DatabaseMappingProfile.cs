@@ -2,6 +2,7 @@ using AutoMapper;
 
 using PaleuzeBackend.Business.Models;
 using PaleuzeBackend.Business.Models.Authentication;
+using PaleuzeBackend.Business.Models.Organisations;
 using PaleuzeBackend.Providers.Database.Entities;
 
 namespace PaleuzeBackend.Providers.Database.Mapping
@@ -15,6 +16,10 @@ namespace PaleuzeBackend.Providers.Database.Mapping
                 .ForMember(model => model.Id, opt => opt.Ignore());
 
             this.CreateMap<UserEntity, User>();
+
+            this.CreateMap<OrganisationEntity, Organisation>();
+            this.CreateMap<Organisation, OrganisationEntity>()
+                .ForMember(model => model.Id, opt => opt.Ignore());
 
             this.CreateMap<RefreshToken, RefreshTokenEntity>()
                 .ForMember(model => model.Id, opt => opt.Ignore());

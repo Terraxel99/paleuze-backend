@@ -2,7 +2,7 @@
 
 namespace PaleuzeBackend.Business.Exceptions.Authentication
 {
-    public class UserNotFoundException : PaleuzeException
+    public class UserNotFoundException : PaleuzeNotFoundException
     {
         public UserNotFoundException(string username)
             : base($"User \"{username}\" does not exist.") 
